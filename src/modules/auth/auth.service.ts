@@ -1,11 +1,9 @@
 import { ConflictException, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
 import { User } from '../users/users.schema';
 import { AuthRepository } from './auth.repository';
-import { ConfigService } from '@nestjs/config';
-import { EmailService } from 'src/services/email/email.service';
+import { EmailService } from '@/services/email/email.service';
 
 @Injectable()
 export class AuthService {
