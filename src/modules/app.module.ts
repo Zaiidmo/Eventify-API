@@ -14,6 +14,7 @@ import { DatabaseConfig } from 'src/config/database.config';
       isGlobal: true,
     }),
     DatabaseConfig,
+    AuthModule,
     UsersModule,
     EventsModule,
     RegistrationsModule,
