@@ -13,7 +13,7 @@ import { MailerConfig } from 'src/config/mailer.config';
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '1h' },
+      signOptions: { expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRES_IN },
     }),
   ],
   controllers: [AuthController],
