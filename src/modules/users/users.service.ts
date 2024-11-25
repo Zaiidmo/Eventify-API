@@ -1,26 +1,38 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UserRepository } from './users.repository';
+import { User } from './users.schema';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(private readonly userRepository: UserRepository) {}
+
+  // Find a user by ID
+  async findById(id: string): Promise<User | null> {
+    return this.userRepository.findById(id);
   }
 
-  findAll() {
-    return `This action returns all users`;
-  }
+  // // Create a new user
+  // async create(userData: Partial<User>): Promise<User> {
+  //   return this.userRepository.create(userData);
+  // }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
+  // Update a user
+  // async updateById(id: string, updateData: Partial<User>): Promise<User | null> {
+  //   return this.userRepository.updateById(id, updateData);
+  // }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
+  // // Delete a user
+  // async deleteById(id: string): Promise<User | null> {
+  //   return this.userRepository.deleteById(id);
+  // }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
+  // // Find a user by email
+  // async findByEmail(email: string): Promise<User | null> {
+  //   return this.userRepository.findByEmail(email);
+  // }
+
+  // // List all users (optional, for admin purposes)
+  // async findAll(): Promise<User[]> {
+  //   return this.userRepository.findAll();
+  // }
 }

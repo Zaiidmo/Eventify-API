@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { AuthRepository } from './auth.repository';
@@ -7,6 +7,7 @@ import { UserSchema } from '../users/users.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { EmailService } from 'src/services/email/email.service';
 import { MailerConfig } from 'src/config/mailer.config';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
