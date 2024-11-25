@@ -5,6 +5,7 @@ import { LoginDto } from './dto/login.dto';
 import { User } from '../users/users.schema';
 import { AuthRepository } from './auth.repository';
 import { ConfigService } from '@nestjs/config';
+import { EmailService } from 'src/services/email/email.service';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +14,7 @@ export class AuthService {
   constructor(
     private readonly authRepository: AuthRepository,
     private readonly jwtService: JwtService,
+    private readonly emailService: EmailService,
     // private readonly configService: ConfigService,
   ) {}
 
@@ -37,6 +39,9 @@ export class AuthService {
       avatar,
       role,
     });
+
+    // Send Registration Email
+    await this.emailService.sendRegistrationEmail(newUser);
 
     return newUser;
   }
