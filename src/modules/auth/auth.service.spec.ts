@@ -6,11 +6,13 @@ import { EmailService } from 'src/services/email/email.service';
 import { ConflictException } from '@nestjs/common';
 import { RegisterDto } from '@/modules/auth/dto/register.dto';
 import { Role,  UserDocument } from '@/modules/users/users.schema';
+import { BcryptService } from './bcrypt.service';
 
 describe('AuthService', () => {
   let authService: AuthService;
   let authRepository: jest.Mocked<AuthRepository>;
   let emailService: jest.Mocked<EmailService>;
+  let bcryptService: jest.Mocked<BcryptService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -20,7 +22,6 @@ describe('AuthService', () => {
           provide: AuthRepository,
           useValue: {
             findByEmail: jest.fn(),
-            hashPassword: jest.fn(),
             create: jest.fn(),
           },
         },
@@ -28,6 +29,12 @@ describe('AuthService', () => {
           provide: EmailService,
           useValue: {
             sendRegistrationEmail: jest.fn(),
+          },
+        },
+        {
+          provide: BcryptService,
+          useValue: {
+            hashPassword: jest.fn(),
           },
         },
         {
@@ -40,6 +47,7 @@ describe('AuthService', () => {
     authService = module.get<AuthService>(AuthService);
     authRepository = module.get(AuthRepository);
     emailService = module.get(EmailService);
+    bcryptService = module.get(BcryptService);
   });
 
   it('should register a user successfully', async () => {
@@ -62,13 +70,13 @@ describe('AuthService', () => {
     } as UserDocument;
 
     authRepository.findByEmail.mockResolvedValue(null);
-    authRepository.hashPassword.mockResolvedValue(hashedPassword);
+    bcryptService.hashPassword.mockResolvedValue(hashedPassword);
     authRepository.create.mockResolvedValue(createdUser);
 
     const result = await authService.register(registerDto);
 
     expect(authRepository.findByEmail).toHaveBeenCalledWith(registerDto.email);
-    expect(authRepository.hashPassword).toHaveBeenCalledWith(registerDto.password);
+    expect(bcryptService.hashPassword).toHaveBeenCalledWith(registerDto.password);
     expect(authRepository.create).toHaveBeenCalledWith({
       username: registerDto.username,
       email: registerDto.email,
@@ -102,7 +110,7 @@ describe('AuthService', () => {
 
     await expect(authService.register(registerDto)).rejects.toThrow(ConflictException);
     expect(authRepository.findByEmail).toHaveBeenCalledWith(registerDto.email);
-    expect(authRepository.hashPassword).not.toHaveBeenCalled();
+    expect(bcryptService.hashPassword).not.toHaveBeenCalled();
     expect(authRepository.create).not.toHaveBeenCalled();
     expect(emailService.sendRegistrationEmail).not.toHaveBeenCalled();
   });
@@ -117,12 +125,12 @@ describe('AuthService', () => {
     };
 
     authRepository.findByEmail.mockResolvedValue(null);
-    authRepository.hashPassword.mockResolvedValue('hashedPassword123');
+    bcryptService.hashPassword.mockResolvedValue('hashedPassword123');
     authRepository.create.mockResolvedValue({} as UserDocument);
 
     await authService.register(registerDto);
 
-    expect(authRepository.hashPassword).toHaveBeenCalledWith(registerDto.password);
+    expect(bcryptService.hashPassword).toHaveBeenCalledWith(registerDto.password);
   });
 
   it('should send registration email after creating user', async () => {
@@ -144,7 +152,7 @@ describe('AuthService', () => {
     } as UserDocument;
 
     authRepository.findByEmail.mockResolvedValue(null);
-    authRepository.hashPassword.mockResolvedValue('hashedPassword123');
+    bcryptService.hashPassword.mockResolvedValue('hashedPassword123');
     authRepository.create.mockResolvedValue(createdUser);
 
     await authService.register(registerDto);

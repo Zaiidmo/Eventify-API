@@ -53,6 +53,7 @@ describe('AuthController', () => {
       const result = await authController.register(registerDto);
 
       expect(authService.register).toHaveBeenCalledWith(registerDto);
+      expect(result.password).toBeUndefined();
       expect(result).toEqual(mockUser);
     });
 
