@@ -10,7 +10,7 @@ export class AuthRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   async findByEmail(email: string): Promise<UserDocument | null> {
-    return this.userModel.findOne({ email }).exec();
+    return this.userModel.findOne({ email: email }).exec();
   }
 
   async create(userData: RegisterDto): Promise<UserDocument> {
@@ -26,8 +26,4 @@ export class AuthRepository {
       .exec();
   }
 
-  async hashPassword(password: string): Promise<string> {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    return hashedPassword;
-  }
 }

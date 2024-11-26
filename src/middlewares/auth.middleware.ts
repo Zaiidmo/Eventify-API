@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { NextFunction, Request, Response } from 'express';
+import { UserDocument } from '@/modules/users/users.schema';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
@@ -16,36 +17,42 @@ export class AuthMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers.authorization;
-
+    // console.log('AuthHeader:', authHeader);
+  
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new UnauthorizedException(
-        'Missing or invalid authorization header',
-      );
+      console.log('Authorization header missing or incorrect format');
+      throw new UnauthorizedException('Missing or invalid authorization header');
     }
-
+  
     const token = authHeader.split(' ')[1];
+    // console.log('Extracted Token:', token); 
+  
     try {
       const decoded = await this.jwtService.verifyAsync(token, {
         secret: process.env.JWT_SECRET,
       });
-      //Fetch the user from the database and attach it to the request object
-      const user = await this.userService.findById(decoded._id);
-        if (!user) {
-            throw new UnauthorizedException('User not found');
-        }
-    // Attach the user object to the request object
+      console.log('Decoded Token:', decoded); 
+  
+      // Fetch the user from the database and attach it to the request object
+      const authUser = await this.userService.findById(decoded.sub); 
+      if (!authUser) {
+        console.log('User not found');
+        throw new UnauthorizedException('User not found');
+      }
+  
       req['user'] = {
-        id: decoded._id,
-        role: user.role,
+        _id: authUser._id.toString(),
+        email: authUser.email,
+        role: authUser.role,
       };
-      console.log('User:', req['user']);
-      
+      console.log('Authenticated User:', req['user']);
       next();
     } catch (err) {
+      console.error('Token verification error:', err.message);
       if (err.name === 'TokenExpiredError') {
         throw new UnauthorizedException('Token expired');
       }
       throw new UnauthorizedException('Invalid token');
     }
-  }
+  }  
 }
