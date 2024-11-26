@@ -11,6 +11,8 @@ import { AuthRepository } from './auth.repository';
 import { EmailService } from '@/services/email/email.service';
 import { BcryptService } from './bcrypt.service';
 import { LoginDto } from './dto/login.dto';
+import { UserRepository } from '../users/users.repository';
+import { JwtPayload } from 'jsonwebtoken';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +23,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly emailService: EmailService,
     private readonly bcryptService: BcryptService,
-    // private readonly configService: ConfigService,
+    private readonly userRepository: UserRepository
   ) {}
 
   async register(registerDto: RegisterDto): Promise<User> {
@@ -85,5 +87,36 @@ export class AuthService {
     });
 
     return { accessToken, refreshToken };
+  }
+
+  async refreshToken(
+    refreshToken: string,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    try {
+      //verify refresh token
+      const payload = this.jwtService.verify(refreshToken, {
+        secret: process.env.JWT_REFRESH_SECRET,
+      });
+
+      const user = await this.userRepository.findById(payload.sub);
+      if (!user) {
+        throw new UnauthorizedException('Invalid token');
+      }
+
+      const newPayload = { sub: user._id };
+      const accessToken = this.jwtService.sign(newPayload, {
+        secret: process.env.JWT_SECRET,
+        expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRES_IN,
+      });
+      const newRefreshToken = this.jwtService.sign(newPayload, {
+        secret: process.env.JWT_REFRESH_SECRET,
+        expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN,
+      });
+
+      return { accessToken, refreshToken: newRefreshToken };
+
+    } catch (err) {
+      throw new UnauthorizedException('Invalid token');
+    }
   }
 }

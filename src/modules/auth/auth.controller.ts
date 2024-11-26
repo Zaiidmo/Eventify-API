@@ -16,10 +16,17 @@ export class AuthController {
     return this.authService.register(registerDto);
   }
 
-  // @Post('login')
-  // login(@Body() loginDto: LoginDto) {
-  //   return this.authService.(loginDto);
-  // }
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  login(@Body() loginDto: LoginDto) {
+    return this.authService.login(loginDto);
+  }
+
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  async refresh(@Body('refreshToken') refreshToken: string) {
+    return this.authService.refreshTokens(refreshToken);
+  }
 
   // @Get()
   // findAll() {
