@@ -1,4 +1,9 @@
-import { ConflictException, Injectable, Logger } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/register.dto';
 import { User } from '../users/users.schema';
@@ -48,7 +53,37 @@ export class AuthService {
     return newUser;
   }
 
-  async login(loginDto: LoginDto): Promise<{ accessToken: string }> {
-    
+  async login(
+    loginDto: LoginDto,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    const { email, password } = loginDto;
+
+    //Find the user
+    const user = await this.authRepository.findByEmail(email);
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    //Verify Password
+    const isPasswordValid = await this.bcryptService.compare(
+      password,
+      user.password,
+    );
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    //Generate Tokens
+    const payload = { sub: user._id };
+    const accessToken = this.jwtService.sign(payload, {
+      secret: process.env.JWT_SECRET,
+      expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRES_IN,
+    });
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: process.env.JWT_REFRESH_SECRET,
+      expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN,
+    });
+
+    return { accessToken, refreshToken };
   }
 }
