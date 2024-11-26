@@ -1,13 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from './users.repository';
-import { User } from './users.schema';
+// import { User } from './users.schema';
+import { UserDocument } from './users.schema';
+import { ObjectId } from 'mongoose';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly userRepository: UserRepository) {}
 
   // Find a user by ID
-  async findById(id: string): Promise<User | null> {
+  async findById(id: ObjectId): Promise<UserDocument | null> {
     return this.userRepository.findById(id);
   }
 

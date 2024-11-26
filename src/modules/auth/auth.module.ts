@@ -9,6 +9,9 @@ import { EmailService } from 'src/services/email/email.service';
 import { MailerConfig } from 'src/config/mailer.config';
 import { BcryptService } from './bcrypt.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { UserRepository } from '../users/users.repository';
+import { AuthMiddleware } from '@/middlewares/auth.middleware';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -17,6 +20,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRES_IN },
     }),
+    UsersModule ,
   ],
   controllers: [AuthController],
   providers: [
@@ -26,7 +30,14 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     MailerConfig,
     BcryptService,
     JwtStrategy,
+    UserRepository,
+    AuthMiddleware,
   ],
   exports: [AuthService],
 })
-export class AuthModule {}
+export class AuthModule implements NestModule{
+  configure(consumer: MiddlewareConsumer){
+    consumer
+    .apply(AuthMiddleware).forRoutes('auth/refresh', 'auth/logout');
+  }
+}

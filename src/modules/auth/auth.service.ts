@@ -18,6 +18,22 @@ import { JwtPayload } from 'jsonwebtoken';
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
+  private generateAccessToken(user) {
+    const payload: JwtPayload = { sub: user._id };
+    return this.jwtService.sign(payload, {
+      secret: process.env.JWT_SECRET,
+      expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRES_IN,
+    });
+  }
+
+  private generateRefreshToken(user) {
+    const payload: JwtPayload = { sub: user._id };
+    return this.jwtService.sign(payload, {
+      secret: process.env.JWT_REFRESH_SECRET,
+      expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN,
+    });
+  }
+
   constructor(
     private readonly authRepository: AuthRepository,
     private readonly jwtService: JwtService,
@@ -76,15 +92,8 @@ export class AuthService {
     }
 
     //Generate Tokens
-    const payload = { sub: user._id };
-    const accessToken = this.jwtService.sign(payload, {
-      secret: process.env.JWT_SECRET,
-      expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRES_IN,
-    });
-    const refreshToken = this.jwtService.sign(payload, {
-      secret: process.env.JWT_REFRESH_SECRET,
-      expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN,
-    });
+    const accessToken = this.generateAccessToken(user);
+    const refreshToken = this.generateRefreshToken(user);
 
     return { accessToken, refreshToken };
   }
@@ -103,15 +112,8 @@ export class AuthService {
         throw new UnauthorizedException('Invalid token');
       }
 
-      const newPayload = { sub: user._id };
-      const accessToken = this.jwtService.sign(newPayload, {
-        secret: process.env.JWT_SECRET,
-        expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRES_IN,
-      });
-      const newRefreshToken = this.jwtService.sign(newPayload, {
-        secret: process.env.JWT_REFRESH_SECRET,
-        expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN,
-      });
+      const accessToken = this.generateAccessToken(user);
+      const newRefreshToken = this.generateRefreshToken(user);
 
       return { accessToken, refreshToken: newRefreshToken };
 
