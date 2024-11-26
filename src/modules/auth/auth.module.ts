@@ -19,7 +19,13 @@ import { BcryptService } from './bcrypt.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthRepository, EmailService, MailerConfig, BcryptService],
+  providers: [
+    AuthService,
+    AuthRepository,
+    EmailService,
+    MailerConfig,
+    BcryptService,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}

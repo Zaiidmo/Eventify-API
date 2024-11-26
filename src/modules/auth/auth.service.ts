@@ -5,6 +5,7 @@ import { User } from '../users/users.schema';
 import { AuthRepository } from './auth.repository';
 import { EmailService } from '@/services/email/email.service';
 import { BcryptService } from './bcrypt.service';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +20,8 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto): Promise<User> {
-    const { username, email, password, avatar, role, ...userData} = registerDto;
+    const { username, email, password, avatar, role, ...userData } =
+      registerDto;
 
     // Check if user already exists
     const existingUser = await this.authRepository.findByEmail(email);
@@ -44,5 +46,9 @@ export class AuthService {
     await this.emailService.sendRegistrationEmail(newUser);
 
     return newUser;
+  }
+
+  async login(loginDto: LoginDto): Promise<{ accessToken: string }> {
+    
   }
 }
