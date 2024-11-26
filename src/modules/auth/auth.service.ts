@@ -4,6 +4,7 @@ import { RegisterDto } from './dto/register.dto';
 import { User } from '../users/users.schema';
 import { AuthRepository } from './auth.repository';
 import { EmailService } from '@/services/email/email.service';
+import { BcryptService } from './bcrypt.service';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +14,7 @@ export class AuthService {
     private readonly authRepository: AuthRepository,
     private readonly jwtService: JwtService,
     private readonly emailService: EmailService,
+    private readonly bcryptService: BcryptService,
     // private readonly configService: ConfigService,
   ) {}
 
@@ -26,7 +28,7 @@ export class AuthService {
     }
 
     // Hash the Password
-    const hashedPassword = await this.authRepository.hashPassword(password);
+    const hashedPassword = await this.bcryptService.hashPassword(password);
 
     // Create the User
     const newUser = await this.authRepository.create({
