@@ -4,7 +4,7 @@ import { IsString, IsOptional, IsUrl, IsDate } from 'class-validator';
 export class UpdateEventDto {
   @IsOptional()
   @IsString()
-  name?: string;
+  title?: string;
 
   @IsOptional()
   @IsString()
