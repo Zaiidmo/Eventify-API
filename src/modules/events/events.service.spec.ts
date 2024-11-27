@@ -23,6 +23,7 @@ describe('EventsService', () => {
             findById: jest.fn(),
             updateEvent: jest.fn(),
             delete: jest.fn(),
+            findUpcomingEvents: jest.fn(),
           },
         },
       ],
@@ -224,6 +225,27 @@ describe('EventsService', () => {
       jest.spyOn(repository, 'delete').mockResolvedValue({ deletedCount: 0 });
 
       await expect(service.deleteEvent(eventId, authenticatedUser)).rejects.toThrow(Error);
+    });
+  });
+  
+  describe('getUpcomingEvents', () => {
+    it('should return a list of upcoming events', async () => {
+      const upcomingEvents = [
+        { title: 'Event 1', date: new Date() },
+        { title: 'Event 2', date: new Date() },
+      ] as EventDocument[];
+  
+      jest.spyOn(repository, 'findUpcomingEvents').mockResolvedValue(upcomingEvents);
+  
+      const result = await service.getUpcomingEvents();
+      expect(result).toEqual(upcomingEvents);
+      expect(repository.findUpcomingEvents).toHaveBeenCalled();
+    });
+  
+    it('should throw an error if fetching upcoming events fails', async () => {
+      jest.spyOn(repository, 'findUpcomingEvents').mockRejectedValue(new Error('Failed to fetch upcoming events'));
+  
+      await expect(service.getUpcomingEvents()).rejects.toThrow('Failed to fetch upcoming events');
     });
   });
 });

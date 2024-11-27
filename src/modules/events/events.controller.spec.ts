@@ -21,6 +21,7 @@ describe('EventsController', () => {
     createEvent: jest.fn(),
     updateEvent: jest.fn(),
     deleteEvent: jest.fn(),
+    getUpcomingEvents: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -219,6 +220,33 @@ describe('EventsController', () => {
         await controller.deleteEvent(eventId, mockRequest as any);
       } catch (error) {
         expect(error.message).toBe('Event deletion failed');
+      }
+    });
+  });
+
+  describe('findUpcomingEvents', () => {
+    it('should return a list of upcoming events', async () => {
+      const upcomingEvents = [
+        { title: 'Event 1', date: new Date() },
+        { title: 'Event 2', date: new Date() },
+      ];
+  
+      mockEventService.getUpcomingEvents.mockResolvedValue(upcomingEvents);
+  
+      const response = await controller.findUpcomingEvents();
+  
+      expect(response.message).toBe('Upcoming events fetched successfully');
+      expect(response.data).toEqual(upcomingEvents);
+      expect(mockEventService.getUpcomingEvents).toHaveBeenCalled();
+    });
+  
+    it('should throw an error if fetching upcoming events fails', async () => {
+      mockEventService.getUpcomingEvents.mockRejectedValue(new Error('Failed to fetch upcoming events'));
+  
+      try {
+        await controller.findUpcomingEvents();
+      } catch (error) {
+        expect(error.message).toBe('Failed to fetch upcoming events');
       }
     });
   });
