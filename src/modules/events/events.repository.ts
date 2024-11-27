@@ -11,9 +11,9 @@ export class EventRepository {
   ) {}
 
   // Create a new event
-  async create(createEventDto: CreateEventDto): Promise<Event> {
-    const newEvent = new this.eventModel(createEventDto);
-    return newEvent.save();
+  async create(eventData: Partial<Event>): Promise<Event> {
+    const event = new this.eventModel(eventData);
+    return event.save();
   }
 
   // Find all events

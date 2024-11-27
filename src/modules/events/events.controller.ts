@@ -1,34 +1,33 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
-import { UpdateEventDto } from './dto/update-event.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '../users/users.schema';
+import { multerConfig } from '@/config/multer.config';
 
 @Controller('events')
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
-  @Post()
-  create(@Body() createEventDto: CreateEventDto) {
-    return this.eventsService.create(createEventDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.eventsService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.eventsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
-    return this.eventsService.update(+id, updateEventDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.eventsService.remove(+id);
+  @Post('create')
+  @Roles(Role.ORGANIZER)
+  @UseInterceptors(FileInterceptor('banner', multerConfig))
+  async createEvent(
+    @Body() createEventDto: CreateEventDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const bannerPath = file ? file.path : null;
+    const event = await this.eventsService.createEvent(createEventDto, bannerPath);
+    return {
+      message: 'Event created successfully',
+      data: event,
+    }
   }
 }

@@ -6,16 +6,16 @@ import {
   IsPositive,
   IsString,
   MaxLength,
-  minLength,
   MinLength,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateEventDto {
   @IsString()
   @MinLength(4)
   @MaxLength(50)
-  @IsNotEmpty({ message: 'Event name is required' })
-  name: string;
+  @IsNotEmpty({ message: 'Event title is required' })
+  title: string;
 
   @IsNotEmpty({ message: 'Description is required' })
   @IsString()
@@ -29,6 +29,7 @@ export class CreateEventDto {
 
   @IsNotEmpty({ message: 'Date is required' })
   @IsDate()
+  @Type(() => Date)
   date: Date;
 
   @IsNotEmpty({ message: 'Capacity is required' })
@@ -36,7 +37,7 @@ export class CreateEventDto {
   @IsPositive()
   capacity: number;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   banner?: string;
 }

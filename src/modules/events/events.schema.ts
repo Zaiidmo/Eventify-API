@@ -22,9 +22,6 @@ export class Event {
 
     @Prop()
     banner?: string;
-
-    @Prop({ required: true, default: false })
-    isPublished: boolean;
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);
