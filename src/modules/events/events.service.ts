@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { EventRepository } from './events.repository';
@@ -78,7 +78,7 @@ export class EventsService {
     }
     // Step 2: Check if the authenticated user is the organizer of the event
     if (event.organizer.toString() !== authenticatedUser.toString()) {
-      throw new NotFoundException(
+      throw new UnauthorizedException(
         `You are not authorized to delete this event`,
       );
     }
