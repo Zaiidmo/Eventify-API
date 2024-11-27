@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Event, EventDocument } from './events.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateEventDto } from './dto/create-event.dto';
 
 @Injectable()
@@ -22,8 +22,8 @@ export class EventRepository {
   }
 
   // Find an event by ID
-  async findById(id: string): Promise<Event | null> {
-    return this.eventModel.findById(id).exec();
+  async findById(id: Types.ObjectId): Promise<Event | null> {
+    return this.eventModel.findById(id).populate('organizer').exec();
   }
 
   // Update an event
