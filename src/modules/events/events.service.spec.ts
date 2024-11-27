@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { EventsService } from './events.service';
 import { EventRepository } from './events.repository';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Types } from 'mongoose';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
@@ -22,6 +22,7 @@ describe('EventsService', () => {
             findAll: jest.fn(),
             findById: jest.fn(),
             updateEvent: jest.fn(),
+            delete: jest.fn(),
           },
         },
       ],
@@ -177,6 +178,52 @@ describe('EventsService', () => {
       await expect(
         service.updateEvent(eventId, updateEventDto, file, authenticatedUser),
       ).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('deleteEvent', () => {
+    it('should delete the event if found and user is authorized', async () => {
+      const eventId = new Types.ObjectId();
+      const authenticatedUser = new Types.ObjectId();
+      const event: EventDocument = { title: 'Test Event', organizer: authenticatedUser } as EventDocument;
+
+      jest.spyOn(service, 'getEventById').mockResolvedValue(event);
+      jest.spyOn(repository, 'delete').mockResolvedValue({ deletedCount: 1 });
+
+      const result = await service.deleteEvent(eventId, authenticatedUser);
+      expect(result).toEqual({ id: eventId, message: 'Event deleted successfully' });
+      expect(repository.delete).toHaveBeenCalledWith(eventId);
+    });
+
+    it('should throw NotFoundException if event not found', async () => {
+      const eventId = new Types.ObjectId();
+      const authenticatedUser = new Types.ObjectId();
+
+      jest.spyOn(service, 'getEventById').mockResolvedValue(null);
+
+      await expect(service.deleteEvent(eventId, authenticatedUser)).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw UnauthorizedException if user is not authorized', async () => {
+      const eventId = new Types.ObjectId();
+      const authenticatedUser = new Types.ObjectId();
+      const event: EventDocument = { title: 'Test Event', organizer: new Types.ObjectId() } as EventDocument;
+
+      jest.spyOn(service, 'getEventById').mockResolvedValue(event);
+
+      await expect(service.deleteEvent(eventId, authenticatedUser)).rejects.toThrow(UnauthorizedException);
+      await expect(service.deleteEvent(eventId, authenticatedUser)).rejects.toThrow('You are not authorized to delete this event');
+    });
+
+    it('should throw an error if event deletion fails', async () => {
+      const eventId = new Types.ObjectId();
+      const authenticatedUser = new Types.ObjectId();
+      const event: EventDocument = { title: 'Test Event', organizer: authenticatedUser } as EventDocument;
+
+      jest.spyOn(service, 'getEventById').mockResolvedValue(event);
+      jest.spyOn(repository, 'delete').mockResolvedValue({ deletedCount: 0 });
+
+      await expect(service.deleteEvent(eventId, authenticatedUser)).rejects.toThrow(Error);
     });
   });
 });

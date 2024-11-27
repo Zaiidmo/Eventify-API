@@ -3,7 +3,7 @@ import { EventsController } from './events.controller';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
-import { NotFoundException, ForbiddenException } from '@nestjs/common';
+import { NotFoundException, ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { Types } from 'mongoose';
 import { Request } from 'express';
 
@@ -20,6 +20,7 @@ describe('EventsController', () => {
   const mockEventService = {
     createEvent: jest.fn(),
     updateEvent: jest.fn(),
+    deleteEvent: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -162,6 +163,62 @@ describe('EventsController', () => {
         await controller.updateEvent(eventId, updateEventDto, file, mockRequest);
       } catch (error) {
         expect(error.response.message).toBe('Not authorized');
+      }
+    });
+  });
+
+  describe('deleteEvent', () => {
+    it('should successfully delete an event', async () => {
+      const eventId = new Types.ObjectId('674766b333296d40ec4eb94f');
+  
+      // Mock service response
+      mockEventService.deleteEvent.mockResolvedValue({
+        id: eventId,
+        message: 'Event deleted successfully',
+      });
+  
+      const response = await controller.deleteEvent(eventId, mockRequest as any);
+  
+      expect(response.message).toBe('Event deleted successfully');
+      // expect(response.id).toBe(eventId);
+      expect(mockEventService.deleteEvent).toHaveBeenCalledWith(eventId, mockRequest.user._id);
+    });
+  
+    it('should throw NotFoundException if event not found', async () => {
+      const eventId = new Types.ObjectId();
+  
+      mockEventService.deleteEvent.mockRejectedValue(new NotFoundException('Event not found'));
+  
+      try {
+        await controller.deleteEvent(eventId, mockRequest as any);
+      } catch (error) {
+        expect(error).toBeInstanceOf(NotFoundException);
+        expect(error.response.message).toBe('Event not found');
+      }
+    });
+  
+    it('should throw UnauthorizedException if user is not authorized', async () => {
+      const eventId = new Types.ObjectId();
+  
+      mockEventService.deleteEvent.mockRejectedValue(new UnauthorizedException('Not authorized'));
+  
+      try {
+        await controller.deleteEvent(eventId, mockRequest as any);
+      } catch (error) {
+        expect(error).toBeInstanceOf(UnauthorizedException);
+        expect(error.response.message).toBe('Not authorized');
+      }
+    });
+  
+    it('should throw an error if event deletion fails', async () => {
+      const eventId = new Types.ObjectId();
+  
+      mockEventService.deleteEvent.mockRejectedValue(new Error('Event deletion failed'));
+  
+      try {
+        await controller.deleteEvent(eventId, mockRequest as any);
+      } catch (error) {
+        expect(error.message).toBe('Event deletion failed');
       }
     });
   });

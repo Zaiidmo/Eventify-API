@@ -7,6 +7,8 @@ import {
   Patch,
   Param,
   Request,
+  Delete,
+  Get,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -17,6 +19,7 @@ import { multerConfig } from '@/config/multer.config';
 import { Request as REQ } from 'express';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { Types } from 'mongoose';
+import { Public } from '@/common/decorators/public.decorator';
 
 @Controller('events')
 export class EventsController {
@@ -28,7 +31,7 @@ export class EventsController {
   async createEvent(
     @Body() createEventDto: CreateEventDto,
     @UploadedFile() file: Express.Multer.File,
-    @Request() request: REQ
+    @Request() request: REQ,
   ) {
     const bannerPath = file ? file.path : null;
     const organizerId = request.user._id;
@@ -56,11 +59,10 @@ export class EventsController {
     @Request() req: any,
   ) {
     const _eventId = new Types.ObjectId(eventId);
-    
+
     const authenticatedUser = req.user._id;
     console.log('authenticatedUser', authenticatedUser);
-    
-    
+
     const event = await this.eventsService.updateEvent(
       _eventId,
       updateEventDto,
@@ -71,5 +73,44 @@ export class EventsController {
       message: 'Event updated successfully',
       data: event,
     };
+  }
+
+  // Delete an Event
+  @Delete('delete/:id')
+  @Roles(Role.ORGANIZER)
+  async deleteEvent(@Param('id') id: Types.ObjectId, @Request() req: any) {
+    const authenticatedUser = req.user._id;
+    try {
+      const response = await this.eventsService.deleteEvent(
+        id,
+        authenticatedUser,
+      );
+      return {
+        status: 'success',
+        message: 'Event deleted successfully',
+        data: response,
+      };
+    } catch (error) {
+      return {
+        status: 'error',
+        message: error.message || 'Something went wrong',
+        error: error.response || error,
+      };
+    }
+  }
+
+  // Fetch all events
+  @Get('all')
+  @Public()
+  async findAllEvents() {
+    try {
+      const events = await this.eventsService.getAllEvents();
+      return {
+        message: 'Events fetched successfully',
+        data: events,
+      };
+    } catch (error) {
+      throw new Error(error.message);
+    }
   }
 }

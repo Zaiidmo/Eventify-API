@@ -5,7 +5,9 @@ import { Event, EventDocument } from './events.schema';
 
 @Injectable()
 export class EventRepository {
-  constructor(@InjectModel(Event.name) private eventModel: Model<EventDocument>) {}
+  constructor(
+    @InjectModel(Event.name) private eventModel: Model<EventDocument>,
+  ) {}
 
   // Create a new event
   async create(eventData: Partial<EventDocument>): Promise<EventDocument> {
@@ -23,37 +25,33 @@ export class EventRepository {
     return this.eventModel.findById(eventId).exec();
   }
 
-  async updateEvent(eventId: Types.ObjectId, eventData: Partial<EventDocument>): Promise<EventDocument> {
-    return this.eventModel.findByIdAndUpdate(eventId, eventData, { new: true }).exec();
-  }  
-// // Update an event
-//   async update(
-//     id: string,
-//     updateEventDto: Partial<CreateEventDto>,
-//   ): Promise<Event | null> {
-//     return this.eventModel
-//       .findByIdAndUpdate(id, updateEventDto, { new: true })
-//       .exec();
-//   }
+  async updateEvent(
+    eventId: Types.ObjectId,
+    eventData: Partial<EventDocument>,
+  ): Promise<EventDocument> {
+    return this.eventModel
+      .findByIdAndUpdate(eventId, eventData, { new: true })
+      .exec();
+  }
 
-//   // Delete an event
-//   async delete(id: string): Promise<Event | null> {
-//     return this.eventModel.findByIdAndDelete(id).exec();
-//   }
+  // Delete an event
+  async delete(eventId: Types.ObjectId): Promise<any> {
+    return await this.eventModel.deleteOne({ _id: eventId }).exec();
+  }
 
-//   // Find upcoming events
-//   async findUpcomingEvents(): Promise<Event[]> {
-//     return this.eventModel
-//       .find({
-//         date: { $gte: new Date() },
-//         isPublished: true,
-//       })
-//       .sort({ date: 1 })
-//       .exec();
-//   }
+  //   // Find upcoming events
+  //   async findUpcomingEvents(): Promise<Event[]> {
+  //     return this.eventModel
+  //       .find({
+  //         date: { $gte: new Date() },
+  //         isPublished: true,
+  //       })
+  //       .sort({ date: 1 })
+  //       .exec();
+  //   }
 
-//   // Find events by location
-//   async findEventsByLocation(location: string): Promise<Event[]> {
-//     return this.eventModel.find({ location }).exec();
-//   }
+  //   // Find events by location
+  //   async findEventsByLocation(location: string): Promise<Event[]> {
+  //     return this.eventModel.find({ location }).exec();
+  //   }
 }
