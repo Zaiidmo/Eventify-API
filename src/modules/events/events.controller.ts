@@ -113,4 +113,19 @@ export class EventsController {
       throw new Error(error.message);
     }
   }
+
+  // Fetch Upcoming Events
+  @Get('upcoming')
+  @Public()
+  async findUpcomingEvents() {
+    try {
+      const events = await this.eventsService.getUpcomingEvents();
+      return {
+        message: 'Upcoming events fetched successfully',
+        data: events,
+      };
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }
 }

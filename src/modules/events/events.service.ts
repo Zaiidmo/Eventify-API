@@ -93,10 +93,10 @@ export class EventsService {
       throw new Error(`Error deleting event with ID ${id}`);
     }
   }
-  // // Fetch upcoming events
-  // async getUpcomingEvents(): Promise<Event[]> {
-  //   return this.eventRepository.findUpcomingEvents();
-  // }
+  // Fetch upcoming events
+  async getUpcomingEvents(): Promise<Event[]> {
+    return this.eventRepository.findUpcomingEvents();
+  }
   // // Fetch events by location
   // async getEventsByLocation(location: string): Promise<Event[]> {
   //   return this.eventRepository.findEventsByLocation(location);
