@@ -7,6 +7,7 @@ import {
   Patch,
   Param,
   Request,
+  Delete,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -28,7 +29,7 @@ export class EventsController {
   async createEvent(
     @Body() createEventDto: CreateEventDto,
     @UploadedFile() file: Express.Multer.File,
-    @Request() request: REQ
+    @Request() request: REQ,
   ) {
     const bannerPath = file ? file.path : null;
     const organizerId = request.user._id;
@@ -56,11 +57,10 @@ export class EventsController {
     @Request() req: any,
   ) {
     const _eventId = new Types.ObjectId(eventId);
-    
+
     const authenticatedUser = req.user._id;
     console.log('authenticatedUser', authenticatedUser);
-    
-    
+
     const event = await this.eventsService.updateEvent(
       _eventId,
       updateEventDto,
@@ -71,5 +71,29 @@ export class EventsController {
       message: 'Event updated successfully',
       data: event,
     };
+  }
+
+  // Delete an Event
+  @Delete('delete/:id')
+  @Roles(Role.ORGANIZER)
+  async deleteEvent(@Param('id') id: Types.ObjectId, @Request() req: any) {
+    const authenticatedUser = req.user._id;
+    try {
+      const response = await this.eventsService.deleteEvent(
+        id,
+        authenticatedUser,
+      );
+      return {
+        status: 'success',
+        message: 'Event deleted successfully',
+        data: response,
+      };
+    } catch (error) {
+      return {
+        status: 'error',
+        message: error.message || 'Something went wrong',
+        error: error.response || error,
+      };
+    }
   }
 }
