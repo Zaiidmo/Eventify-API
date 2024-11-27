@@ -1,59 +1,55 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Event, EventDocument } from './events.schema';
 import { Model, Types } from 'mongoose';
-import { CreateEventDto } from './dto/create-event.dto';
+import { Event, EventDocument } from './events.schema';
 
 @Injectable()
 export class EventRepository {
-  constructor(
-    @InjectModel(Event.name) private readonly eventModel: Model<EventDocument>,
-  ) {}
+  constructor(@InjectModel(Event.name) private eventModel: Model<EventDocument>) {}
 
   // Create a new event
-  async create(eventData: Partial<Event>): Promise<Event> {
+  async create(eventData: Partial<EventDocument>): Promise<EventDocument> {
     const event = new this.eventModel(eventData);
     return event.save();
   }
 
-  // Find all events
-  async findAll(): Promise<Event[]> {
+  // Fetch all events
+  async findAll(): Promise<EventDocument[]> {
     return this.eventModel.find().exec();
   }
 
-  // Find an event by ID
-  async findById(id: Types.ObjectId): Promise<Event | null> {
-    return this.eventModel.findById(id).populate('organizer').exec();
+  // Fetch a single event by ID
+  async findById(eventId: Types.ObjectId): Promise<EventDocument | null> {
+    return this.eventModel.findById(eventId).exec();
   }
+// // Update an event
+//   async update(
+//     id: string,
+//     updateEventDto: Partial<CreateEventDto>,
+//   ): Promise<Event | null> {
+//     return this.eventModel
+//       .findByIdAndUpdate(id, updateEventDto, { new: true })
+//       .exec();
+//   }
 
-  // Update an event
-  async update(
-    id: string,
-    updateEventDto: Partial<CreateEventDto>,
-  ): Promise<Event | null> {
-    return this.eventModel
-      .findByIdAndUpdate(id, updateEventDto, { new: true })
-      .exec();
-  }
+//   // Delete an event
+//   async delete(id: string): Promise<Event | null> {
+//     return this.eventModel.findByIdAndDelete(id).exec();
+//   }
 
-  // Delete an event
-  async delete(id: string): Promise<Event | null> {
-    return this.eventModel.findByIdAndDelete(id).exec();
-  }
+//   // Find upcoming events
+//   async findUpcomingEvents(): Promise<Event[]> {
+//     return this.eventModel
+//       .find({
+//         date: { $gte: new Date() },
+//         isPublished: true,
+//       })
+//       .sort({ date: 1 })
+//       .exec();
+//   }
 
-  // Find upcoming events
-  async findUpcomingEvents(): Promise<Event[]> {
-    return this.eventModel
-      .find({
-        date: { $gte: new Date() },
-        isPublished: true,
-      })
-      .sort({ date: 1 })
-      .exec();
-  }
-
-  // Find events by location
-  async findEventsByLocation(location: string): Promise<Event[]> {
-    return this.eventModel.find({ location }).exec();
-  }
+//   // Find events by location
+//   async findEventsByLocation(location: string): Promise<Event[]> {
+//     return this.eventModel.find({ location }).exec();
+//   }
 }

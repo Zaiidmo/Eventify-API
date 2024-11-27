@@ -1,6 +1,7 @@
 import {
   IsDate,
   IsInt,
+  IsMongoId,
   IsNotEmpty,
   IsOptional,
   IsPositive,
@@ -9,6 +10,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { Types } from 'mongoose';
 
 export class CreateEventDto {
   @IsString()
@@ -36,6 +38,10 @@ export class CreateEventDto {
   @IsInt()
   @IsPositive()
   capacity: number;
+
+  @IsMongoId({ message: 'Organizer is invalid' })
+  @IsNotEmpty({ message: 'Organizer is required' })
+  organizer: Types.ObjectId;
 
   @IsOptional()
   @IsString()

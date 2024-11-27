@@ -7,7 +7,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '@/common/decorators/roles.decorator';
 import { Role } from '@/modules/users/users.schema';
-import { request } from 'http';
+import { Request } from 'express';
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
@@ -22,7 +22,7 @@ export class RolesGuard implements CanActivate {
     }
     const { user } = context.switchToHttp().getRequest();
     // console.log(user);
-    request['user'] = user;
+    Request['user'] = user;
     
     if (!user || !requiredRoles.includes(user.role)) {
       throw new ForbiddenException('Access denied');

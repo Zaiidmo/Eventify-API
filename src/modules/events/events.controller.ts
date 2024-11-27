@@ -11,7 +11,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { Role } from '../users/users.schema';
 import { multerConfig } from '@/config/multer.config';
-import { request } from 'http';
+import { Request } from 'express';
 
 @Controller('events')
 export class EventsController {
@@ -25,8 +25,8 @@ export class EventsController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     const bannerPath = file ? file.path : null;
-    const organizerId = request['user']._id;
-    console.log('organizerId', organizerId);
+    const organizerId = Request['user']._id;
+    // console.log('organizerId', organizerId);
     
     const event = await this.eventsService.createEvent(createEventDto, bannerPath, organizerId);
     return {
