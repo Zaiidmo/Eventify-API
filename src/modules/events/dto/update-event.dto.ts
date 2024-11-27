@@ -1,4 +1,24 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateEventDto } from './create-event.dto';
+import { Type } from 'class-transformer';
+import { IsString, IsOptional, IsUrl, IsDate } from 'class-validator';
 
-export class UpdateEventDto extends PartialType(CreateEventDto) {}
+export class UpdateEventDto {
+  @IsOptional()
+  @IsString()
+  title?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  location?: string;
+
+  @IsOptional()
+  @IsDate()
+  @Type(() => Date)
+  date: Date;
+
+  @IsOptional()
+  banner?: string;
+}
