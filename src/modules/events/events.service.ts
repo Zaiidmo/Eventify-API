@@ -38,12 +38,32 @@ export class EventsService {
     return event;
   }
   // Update an event
-  // async updateEvent(
-  //   id: string,
-  //   updateEventDto: UpdateEventDto,
-  // ): Promise<Event | null> {
-  //   return this.eventRepository.update(id, updateEventDto);
-  // }
+  async updateEvent(
+    eventId: Types.ObjectId,
+    updateEventDto: UpdateEventDto,
+    file: Express.Multer.File,
+    authenticatedUser: Types.ObjectId,
+  ): Promise<EventDocument> {
+    //Step 1: Fetch The Event's Data 
+    const event = await this.getEventById(eventId);
+    if(!event) {
+      throw new NotFoundException(`Event with ID ${eventId} not found`);
+    }
+    //Step 2: Check if the authenticated user is the organizer of the event
+    if(event.organizer.toString() !== authenticatedUser.toString()) {
+      throw new NotFoundException(`You are not authorized to update this event`);
+    }
+    //Step 3: Update the banner if new file is provided
+    const bannerPath = file ? file.path : event.banner;
+    //Step 4: Update the event data
+    const eventData = {
+      ...updateEventDto,
+      banner: bannerPath,
+    };
+    //Step 5: Save the updated event data
+    const updatedEvent = this.eventRepository.updateEvent(eventId, eventData);
+    return updatedEvent;
+  }  
   // // Delete an event
   // async deleteEvent(id: string): Promise<Event | null> {
   //   return this.eventRepository.delete(id);
