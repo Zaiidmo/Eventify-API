@@ -7,20 +7,22 @@ import {
   HttpStatus,
   UseInterceptors,
   ValidationPipe,
-  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { ExcludePasswordInterceptor } from 'src/interceptors/exclude-password.interceptor';
 import { Response } from 'express';
-import { AuthMiddleware } from '@/middlewares/auth.middleware';
+import { Public } from '@/common/decorators/public.decorator';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '../users/users.schema';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
+  @Public()
   @UseInterceptors(ExcludePasswordInterceptor)
   @HttpCode(HttpStatus.CREATED)
   async register(@Body(new ValidationPipe()) registerDto: RegisterDto) {
@@ -28,6 +30,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @Public()
   @HttpCode(HttpStatus.OK)
   login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
@@ -53,6 +56,7 @@ export class AuthController {
     return { accessToken };
   }
 
+  @Roles(Role.ORGANIZER, Role.ADMIN)
   @Post('logout')
   logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('refreshToken');

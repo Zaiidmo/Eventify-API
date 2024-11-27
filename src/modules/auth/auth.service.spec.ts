@@ -184,7 +184,7 @@ describe('AuthService', () => {
       const user = { _id: 'user_id', email: 'user@example.com' };
 
       // Mock the jwtService to verify the refresh token
-      jwtService.verify = jest.fn().mockReturnValue({ sub: user._id });
+      jwtService.verify = jest.fn().mockReturnValue({ _id: user._id });
 
       // Mock the userRepository to return a user
       userRepository.findById = jest.fn().mockResolvedValue(user);

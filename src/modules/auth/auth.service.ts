@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/register.dto';
-import { User } from '../users/users.schema';
+import { User, UserDocument } from '../users/users.schema';
 import { AuthRepository } from './auth.repository';
 import { EmailService } from '@/services/email/email.service';
 import { BcryptService } from './bcrypt.service';
@@ -18,16 +18,16 @@ import { JwtPayload } from 'jsonwebtoken';
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
-  private generateAccessToken(user) {
-    const payload: JwtPayload = { sub: user._id };
+  private generateAccessToken(user: UserDocument) {
+    const payload: JwtPayload = { _id: user._id.toString() };
     return this.jwtService.sign(payload, {
       secret: process.env.JWT_SECRET,
       expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRES_IN,
     });
   }
 
-  private generateRefreshToken(user) {
-    const payload: JwtPayload = { sub: user._id };
+  private generateRefreshToken(user: UserDocument) {
+    const payload: JwtPayload = { _id: user._id.toString() };
     return this.jwtService.sign(payload, {
       secret: process.env.JWT_REFRESH_SECRET,
       expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN,
@@ -107,7 +107,7 @@ export class AuthService {
         secret: process.env.JWT_REFRESH_SECRET,
       });
 
-      const user = await this.userRepository.findById(payload.sub);
+      const user = await this.userRepository.findById(payload._id);
       if (!user) {
         throw new UnauthorizedException('Invalid token');
       }
