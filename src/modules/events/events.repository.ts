@@ -22,6 +22,10 @@ export class EventRepository {
   async findById(eventId: Types.ObjectId): Promise<EventDocument | null> {
     return this.eventModel.findById(eventId).exec();
   }
+
+  async updateEvent(eventId: Types.ObjectId, eventData: Partial<EventDocument>): Promise<EventDocument> {
+    return this.eventModel.findByIdAndUpdate(eventId, eventData, { new: true }).exec();
+  }  
 // // Update an event
 //   async update(
 //     id: string,
