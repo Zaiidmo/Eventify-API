@@ -62,6 +62,19 @@ export class EventRepository {
       .exec();
   }
 
+  // Increment event capacity
+  async incrementCapacity(eventId: Types.ObjectId): Promise<any> {
+    return this.eventModel
+      .findByIdAndUpdate(
+        eventId,
+        {
+          $inc: { capacity: 1 },
+        },
+        { new: true },
+      )
+      .exec();
+  }
+
   //   // Find events by location
   //   async findEventsByLocation(location: string): Promise<Event[]> {
   //     return this.eventModel.find({ location }).exec();
