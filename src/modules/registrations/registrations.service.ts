@@ -15,8 +15,12 @@ export class RegistrationsService {
     private readonly registrationRepository: RegistrationRepository,
     private readonly eventRepository: EventRepository,
   ) {}
-  async createRegistration(createRegistrationDto: CreateRegistrationDto, userId: string) {
-    createRegistrationDto.user = new Types.ObjectId(userId);
+  async createRegistration(
+    createRegistrationDto: CreateRegistrationDto,
+    userId: string,
+  ) {
+    createRegistrationDto.user = userId;
+    // createRegistrationDto.event = new Types.ObjectId(createRegistrationDto.event);
     const { event } = createRegistrationDto;
 
     // Fetch event details from MongoDB
@@ -34,8 +38,12 @@ export class RegistrationsService {
       user: userId,
       event: eventId,
     });
+
     if (existingRegistration) {
-      throw new Error('You are already registered for this event.');
+      // throw new Error('You are already registered for this event.');
+      return {
+        message: 'You are already registered for this event.',
+      };
     }
 
     // Ensure event has capacity
@@ -49,9 +57,12 @@ export class RegistrationsService {
     );
 
     // Decrement event capacity in MongoDB
-    // await this.eventRepository.decrementCapacity(event);
+    await this.eventRepository.decrementCapacity(event);
 
-    return registration;
+    return {
+      message: 'Registration successful',
+      date: registration,
+    };
   }
 
   findAll() {

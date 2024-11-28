@@ -39,15 +39,28 @@ export class EventRepository {
     return await this.eventModel.deleteOne({ _id: eventId }).exec();
   }
 
-    // Find upcoming events
-    async findUpcomingEvents(): Promise<Event[]> {
-      return this.eventModel
-        .find({
-          date: { $gte: new Date() },
-        })
-        .sort({ date: 1 })
-        .exec();
-    }
+  // Find upcoming events
+  async findUpcomingEvents(): Promise<Event[]> {
+    return this.eventModel
+      .find({
+        date: { $gte: new Date() },
+      })
+      .sort({ date: 1 })
+      .exec();
+  }
+
+  //Decrement event capacity
+  async decrementCapacity(eventId: Types.ObjectId): Promise<any> {
+    return this.eventModel
+      .findByIdAndUpdate(
+        eventId,
+        {
+          $inc: { capacity: -1 },
+        },
+        { new: true },
+      )
+      .exec();
+  }
 
   //   // Find events by location
   //   async findEventsByLocation(location: string): Promise<Event[]> {

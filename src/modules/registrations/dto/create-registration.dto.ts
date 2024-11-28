@@ -4,7 +4,7 @@ import { Types } from 'mongoose';
 export class CreateRegistrationDto {
   @IsMongoId()
   @IsNotEmpty()
-  user: Types.ObjectId;
+  user: string;
 
   @IsMongoId()
   @IsNotEmpty()
