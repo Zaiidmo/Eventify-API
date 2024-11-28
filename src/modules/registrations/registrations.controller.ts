@@ -33,6 +33,17 @@ export class RegistrationsController {
     }
   }
 
+  // Delete a regestration
+  @Delete(':id')
+  remove(@Param('id') id: string, @Request() request: req) {
+    const user = request.user._id.toString();
+    try{
+    return this .registrationsService.removeRegistration(user, id);
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }
+
   @Get()
   findAll() {
     return this.registrationsService.findAll();
@@ -51,8 +62,4 @@ export class RegistrationsController {
     return this.registrationsService.update(+id, updateRegistrationDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.registrationsService.remove(+id);
-  }
 }
