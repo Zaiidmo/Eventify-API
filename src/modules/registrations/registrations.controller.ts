@@ -12,11 +12,14 @@ import { RegistrationsService } from './registrations.service';
 import { CreateRegistrationDto } from './dto/create-registration.dto';
 import { UpdateRegistrationDto } from './dto/update-registration.dto';
 import { Request as req } from 'express';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '../users/users.schema';
 
 @Controller('registrations')
 export class RegistrationsController {
   constructor(private readonly registrationsService: RegistrationsService) {}
 
+  // Create a new registration
   @Post()
   create(
     @Body() createRegistrationDto: CreateRegistrationDto,
@@ -33,26 +36,29 @@ export class RegistrationsController {
     }
   }
 
-  @Get()
-  findAll() {
-    return this.registrationsService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.registrationsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateRegistrationDto: UpdateRegistrationDto,
-  ) {
-    return this.registrationsService.update(+id, updateRegistrationDto);
-  }
-
+  // Delete a regestration
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.registrationsService.remove(+id);
+  remove(@Param('id') id: string, @Request() request: req) {
+    const user = request.user._id.toString();
+    try {
+      return this.registrationsService.removeRegistration(user, id);
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }
+
+  // Get all registrations for an event
+  @Get('events/:id')
+  @Roles(Role.ORGANIZER, Role.ADMIN)
+  async getEventRegistrations(
+    @Param('id') id: string,
+    @Request() request: req,
+  ) {
+    try {
+      const user = request.user._id;
+      return this.registrationsService.getEventsRegistrations(id, user);
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 }

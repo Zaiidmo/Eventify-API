@@ -23,4 +23,14 @@ export class RegistrationRepository {
   }): Promise<RegistrationDocument | null> {
     return this.registrationModel.findOne(filter).exec();
   }
+  async delete(filter: {
+    user: string;
+    event: string;
+  }){
+    return this.registrationModel.deleteOne(filter).exec();
+  }
+
+  async getEventsRegistrations(eventId: Types.ObjectId) {
+    return this.registrationModel.find({ event: eventId }).exec();
+  }
 }

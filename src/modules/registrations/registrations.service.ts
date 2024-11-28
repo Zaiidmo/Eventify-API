@@ -64,20 +64,39 @@ export class RegistrationsService {
       data: registration,
     };
   }
+  async removeRegistration(userId: string, eventId: string) {
+    const registration = await this.registrationRepository.delete({
+      user: userId,
+      event: eventId,
+    });    
 
-  findAll() {
-    return `This action returns all registrations`;
+    if (registration.deletedCount === 0) {
+      throw new NotFoundException('Registration not found.');
+    }
+
+    const event_id = new Types.ObjectId(eventId);
+
+    // Increment event capacity in MongoDB
+    await this.eventRepository.incrementCapacity(event_id);
+
+    return registration;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} registration`;
-  }
-
-  update(id: number, updateRegistrationDto: UpdateRegistrationDto) {
-    return `This action updates a #${id} registration`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} registration`;
+  async getEventsRegistrations(eventId: string, userId: Types.ObjectId): Promise<any> {
+    const event_id = new Types.ObjectId(eventId);
+    const eventDetails = await this.eventRepository.findById(event_id);
+    if (!eventDetails) {
+      throw new NotFoundException('Event not found');
+    }
+    if (eventDetails.organizer.toString() !== userId.toString()) {
+      throw new BadRequestException(
+        'You are not authorized to view this resource',
+      );
+    }
+    const participations = this.registrationRepository.getEventsRegistrations(event_id);
+    return {
+      message: 'Event registrations',
+      data: participations
+    }
   }
 }
