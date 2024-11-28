@@ -64,6 +64,25 @@ export class RegistrationsService {
       data: registration,
     };
   }
+  async removeRegistration(userId: string, eventId: string) {
+    const registration = await this.registrationRepository.delete({
+      user: userId,
+      event: eventId,
+    });
+
+    if (!registration) {
+      throw new NotFoundException('Registration not found.');
+    }
+
+    const event_id = new Types.ObjectId(eventId);
+
+    // Increment event capacity in MongoDB
+    await this.eventRepository.incrementCapacity(event_id);
+
+    return {
+      message: 'Registration removed',
+    };
+  }
 
   findAll() {
     return `This action returns all registrations`;
@@ -75,9 +94,5 @@ export class RegistrationsService {
 
   update(id: number, updateRegistrationDto: UpdateRegistrationDto) {
     return `This action updates a #${id} registration`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} registration`;
   }
 }
