@@ -34,6 +34,7 @@ describe('EmailService', () => {
   describe('sendRegistrationEmail', () => {
     const mockUser: User = {
       email: 'test@example.com',
+      
       username: 'testuser',
     } as User;
 

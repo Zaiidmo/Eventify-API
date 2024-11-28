@@ -61,7 +61,7 @@ export class RegistrationsService {
 
     return {
       message: 'Registration successful',
-      date: registration,
+      data: registration,
     };
   }
 
