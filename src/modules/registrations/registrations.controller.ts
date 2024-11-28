@@ -23,7 +23,14 @@ export class RegistrationsController {
     @Request() request: req,
   ): Promise<any> {
     const user = request.user._id.toString();
-    return this.registrationsService.createRegistration(createRegistrationDto, user);
+    try {
+      return this.registrationsService.createRegistration(
+        createRegistrationDto,
+        user,
+      );
+    } catch (error) {
+      throw new Error(error.message);
+    }
   }
 
   @Get()
