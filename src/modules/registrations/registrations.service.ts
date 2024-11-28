@@ -1,11 +1,68 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateRegistrationDto } from './dto/create-registration.dto';
 import { UpdateRegistrationDto } from './dto/update-registration.dto';
+import { RegistrationRepository } from './registrations.repository';
+import { EventRepository } from '../events/events.repository';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class RegistrationsService {
-  create(createRegistrationDto: CreateRegistrationDto) {
-    return 'This action adds a new registration';
+  constructor(
+    private readonly registrationRepository: RegistrationRepository,
+    private readonly eventRepository: EventRepository,
+  ) {}
+  async createRegistration(
+    createRegistrationDto: CreateRegistrationDto,
+    userId: string,
+  ) {
+    createRegistrationDto.user = userId;
+    // createRegistrationDto.event = new Types.ObjectId(createRegistrationDto.event);
+    const { event } = createRegistrationDto;
+
+    // Fetch event details from MongoDB
+    const eventDetails = await this.eventRepository.findById(event);
+
+    if (!eventDetails) {
+      throw new Error('Event does not exist.');
+    }
+
+    // const userId = new Types.ObjectId(user).toHexString();
+    const eventId = new Types.ObjectId(event).toHexString();
+
+    // Check if the user is already registered for the event
+    const existingRegistration = await this.registrationRepository.findOne({
+      user: userId,
+      event: eventId,
+    });
+
+    if (existingRegistration) {
+      // throw new Error('You are already registered for this event.');
+      return {
+        message: 'You are already registered for this event.',
+      };
+    }
+
+    // Ensure event has capacity
+    if (eventDetails.capacity <= 0) {
+      throw new Error('Event is full.');
+    }
+
+    // Create a new registration
+    const registration = await this.registrationRepository.create(
+      createRegistrationDto,
+    );
+
+    // Decrement event capacity in MongoDB
+    await this.eventRepository.decrementCapacity(event);
+
+    return {
+      message: 'Registration successful',
+      data: registration,
+    };
   }
 
   findAll() {
