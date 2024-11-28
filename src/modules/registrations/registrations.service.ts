@@ -10,21 +10,22 @@ export class RegistrationsService {
     private readonly registrationRepository: RegistrationRepository,
     private readonly eventRepository: EventRepository,
   ) {}
-  async create(createRegistrationDto: CreateRegistrationDto): Promise<string> {
+  async create(createRegistrationDto: CreateRegistrationDto) {
+    const { user, event } = createRegistrationDto;
     //Check if event exists
-    const event = this.eventRepository.findById(createRegistrationDto.event);
-    if (!event) {
+    const eventDetails = await this.eventRepository.findById(event);
+    if (!eventDetails) {
       throw new NotFoundException('Event not found');
     }
     //Check if user is already registered
-    const existingRegistration = this.registrationRepository.findByUserAndEvent(createRegistrationDto.user, createRegistrationDto.event);
+    const existingRegistration = this.registrationRepository.findByUserAndEvent(user, event);
     if (existingRegistration) {
       throw new BadRequestException('You are already registered for this event');
     }
     //Check Event Capacity
-    // if (event.capacity <= 0) {
-    //   throw new BadRequestException('Event is fully booked');
-    // }
+    if (eventDetails.capacity <= 0) {
+      throw new BadRequestException('Event is fully booked');
+    }
     //Create Registration
     await this,this.registrationRepository.create(createRegistrationDto);
     //Decrement Event Capacity
