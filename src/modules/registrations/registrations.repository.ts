@@ -26,8 +26,8 @@ export class RegistrationRepository {
   async delete(filter: {
     user: string;
     event: string;
-  }): Promise<RegistrationDocument | null> {
-    return this.registrationModel.findOneAndDelete(filter).exec();
+  }){
+    return this.registrationModel.deleteOne(filter).exec();
   }
 
   async getEventsRegistrations(eventId: Types.ObjectId) {

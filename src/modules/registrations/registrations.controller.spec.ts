@@ -83,7 +83,7 @@ describe('RegistrationsController', () => {
   describe('removeRegistration', () => {
     it('should call RegistrationsService.removeRegistration with correct parameters', async () => {
       const eventId = new Types.ObjectId().toString();
-      const mockResponse = { message: 'Registration removed' };
+      const mockResponse = { acknowledged: true, deletedCount: 1 };
 
       jest
         .spyOn(service, 'removeRegistration')

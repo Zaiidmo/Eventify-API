@@ -68,9 +68,9 @@ export class RegistrationsService {
     const registration = await this.registrationRepository.delete({
       user: userId,
       event: eventId,
-    });
+    });    
 
-    if (!registration) {
+    if (registration.deletedCount === 0) {
       throw new NotFoundException('Registration not found.');
     }
 
@@ -79,9 +79,7 @@ export class RegistrationsService {
     // Increment event capacity in MongoDB
     await this.eventRepository.incrementCapacity(event_id);
 
-    return {
-      message: 'Registration removed',
-    };
+    return registration;
   }
 
   async getEventsRegistrations(eventId: string, userId: Types.ObjectId): Promise<any> {
