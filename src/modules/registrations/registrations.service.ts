@@ -1,8 +1,13 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateRegistrationDto } from './dto/create-registration.dto';
 import { UpdateRegistrationDto } from './dto/update-registration.dto';
 import { RegistrationRepository } from './registrations.repository';
 import { EventRepository } from '../events/events.repository';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class RegistrationsService {
@@ -10,26 +15,43 @@ export class RegistrationsService {
     private readonly registrationRepository: RegistrationRepository,
     private readonly eventRepository: EventRepository,
   ) {}
-  async create(createRegistrationDto: CreateRegistrationDto) {
-    const { user, event } = createRegistrationDto;
-    //Check if event exists
+  async createRegistration(createRegistrationDto: CreateRegistrationDto, userId: string) {
+    createRegistrationDto.user = new Types.ObjectId(userId);
+    const { event } = createRegistrationDto;
+
+    // Fetch event details from MongoDB
     const eventDetails = await this.eventRepository.findById(event);
+
     if (!eventDetails) {
-      throw new NotFoundException('Event not found');
+      throw new Error('Event does not exist.');
     }
-    //Check if user is already registered
-    const existingRegistration = this.registrationRepository.findByUserAndEvent(user, event);
+
+    // const userId = new Types.ObjectId(user).toHexString();
+    const eventId = new Types.ObjectId(event).toHexString();
+
+    // Check if the user is already registered for the event
+    const existingRegistration = await this.registrationRepository.findOne({
+      user: userId,
+      event: eventId,
+    });
     if (existingRegistration) {
-      throw new BadRequestException('You are already registered for this event');
+      throw new Error('You are already registered for this event.');
     }
-    //Check Event Capacity
+
+    // Ensure event has capacity
     if (eventDetails.capacity <= 0) {
-      throw new BadRequestException('Event is fully booked');
+      throw new Error('Event is full.');
     }
-    //Create Registration
-    await this,this.registrationRepository.create(createRegistrationDto);
-    //Decrement Event Capacity
-    return 'Registration successful';
+
+    // Create a new registration
+    const registration = await this.registrationRepository.create(
+      createRegistrationDto,
+    );
+
+    // Decrement event capacity in MongoDB
+    // await this.eventRepository.decrementCapacity(event);
+
+    return registration;
   }
 
   findAll() {
