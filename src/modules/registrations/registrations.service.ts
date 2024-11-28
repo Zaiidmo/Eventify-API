@@ -84,15 +84,21 @@ export class RegistrationsService {
     };
   }
 
-  findAll() {
-    return `This action returns all registrations`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} registration`;
-  }
-
-  update(id: number, updateRegistrationDto: UpdateRegistrationDto) {
-    return `This action updates a #${id} registration`;
+  async getEventsRegistrations(eventId: string, userId: Types.ObjectId): Promise<any> {
+    const event_id = new Types.ObjectId(eventId);
+    const eventDetails = await this.eventRepository.findById(event_id);
+    if (!eventDetails) {
+      throw new NotFoundException('Event not found');
+    }
+    if (eventDetails.organizer.toString() !== userId.toString()) {
+      throw new BadRequestException(
+        'You are not authorized to view this resource',
+      );
+    }
+    const participations = this.registrationRepository.getEventsRegistrations(event_id);
+    return {
+      message: 'Event registrations',
+      data: participations
+    }
   }
 }

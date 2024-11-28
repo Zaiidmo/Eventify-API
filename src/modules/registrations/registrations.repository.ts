@@ -29,4 +29,8 @@ export class RegistrationRepository {
   }): Promise<RegistrationDocument | null> {
     return this.registrationModel.findOneAndDelete(filter).exec();
   }
+
+  async getEventsRegistrations(eventId: Types.ObjectId) {
+    return this.registrationModel.find({ event: eventId }).exec();
+  }
 }
