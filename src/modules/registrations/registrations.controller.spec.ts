@@ -3,6 +3,7 @@ import { RegistrationsController } from './registrations.controller';
 import { RegistrationsService } from './registrations.service';
 import { CreateRegistrationDto } from './dto/create-registration.dto';
 import { Types } from 'mongoose';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('RegistrationsController', () => {
   let controller: RegistrationsController;
@@ -16,6 +17,8 @@ describe('RegistrationsController', () => {
   beforeEach(async () => {
     const mockService = {
       createRegistration: jest.fn(),
+      removeRegistration: jest.fn(),
+      getEventsRegistrations: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -75,6 +78,89 @@ describe('RegistrationsController', () => {
       await expect(controller.create(mockDto, mockRequest)).rejects.toThrow(
         'Service error',
       );
+    });
+  });
+  describe('removeRegistration', () => {
+    it('should call RegistrationsService.removeRegistration with correct parameters', async () => {
+      const eventId = new Types.ObjectId().toString();
+      const mockResponse = { message: 'Registration removed' };
+
+      jest
+        .spyOn(service, 'removeRegistration')
+        .mockResolvedValueOnce(mockResponse);
+
+      const result = await controller.remove(eventId, mockRequest);
+
+      expect(service.removeRegistration).toHaveBeenCalledWith(
+        mockRequest.user._id,
+        eventId,
+      );
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should throw NotFoundException if RegistrationsService.removeRegistration fails', async () => {
+      const eventId = new Types.ObjectId().toString();
+
+      jest
+        .spyOn(service, 'removeRegistration')
+        .mockRejectedValueOnce(new NotFoundException('Registration not found'));
+
+      await expect(
+        controller.remove(eventId, mockRequest),
+      ).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('getEventsRegistrations', () => {
+    it('should return event registrations if the user is the organizer', async () => {
+      const eventId = new Types.ObjectId().toString();
+      const mockResponse = {
+        message: 'Event registrations',
+        data: [{ user: 'user1' }, { user: 'user2' }],
+      };
+
+      jest
+        .spyOn(service, 'getEventsRegistrations')
+        .mockResolvedValueOnce(mockResponse);
+
+      const result = await controller.getEventRegistrations(
+        eventId,
+        mockRequest,
+      );
+
+      expect(service.getEventsRegistrations).toHaveBeenCalledWith(
+        eventId,
+        mockRequest.user._id,
+      );
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should throw NotFoundException if the event does not exist', async () => {
+      const eventId = new Types.ObjectId().toString();
+
+      jest
+        .spyOn(service, 'getEventsRegistrations')
+        .mockRejectedValueOnce(new NotFoundException('Event not found'));
+
+      await expect(
+        controller.getEventRegistrations(eventId, mockRequest),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw BadRequestException if the user is not authorized', async () => {
+      const eventId = new Types.ObjectId().toString();
+
+      jest
+        .spyOn(service, 'getEventsRegistrations')
+        .mockRejectedValueOnce(
+          new BadRequestException(
+            'You are not authorized to view this resource',
+          ),
+        );
+
+      await expect(
+        controller.getEventRegistrations(eventId, mockRequest),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 });
