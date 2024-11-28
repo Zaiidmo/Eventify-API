@@ -27,6 +27,21 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      # Create .env file
+      - name: Create .env file
+        run: | 
+          echo ${{ secrets.PORT }} > .env
+          echo ${{ secrets.MONGO_ATLAS_URI }} >> .env
+          echo ${{ secrets.MAIL_HOST }} >> .env
+          echo ${{ secrets.MAIL_PORT }} >> .env
+          echo ${{ secrets.MAIL_USER }} >> .env
+          echo ${{ secrets.MAIL_PASSWORD }} >> .env
+          echo ${{ secrets.JWT_SECRET }} >> .env
+          echo ${{ secrets.JWT_REFRESH_SECRET }} >> .env
+          echo ${{ secrets.JWT_EXPIRES_IN }} >> .env
+          echo ${{ secrets.JWT_REFRESH_TOKEN_EXPIRES_IN }} >> .env
+          echo ${{ secrets.JWT_ACCESS_EXPIRES_IN }} >> .env
+          
       # Run tests
       - name: Run unit tests
         run: npm test
