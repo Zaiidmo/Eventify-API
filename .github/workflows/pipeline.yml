@@ -41,7 +41,7 @@ jobs:
           echo ${{ secrets.JWT_EXPIRES_IN }} >> .env
           echo ${{ secrets.JWT_REFRESH_TOKEN_EXPIRES_IN }} >> .env
           echo ${{ secrets.JWT_ACCESS_EXPIRES_IN }} >> .env
-          
+
       # Run tests
       - name: Run unit tests
         run: npm test
