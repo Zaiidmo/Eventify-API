@@ -143,6 +143,7 @@ describe('AuthService', () => {
       const result = await authService.login(loginDto);
 
       expect(result).toEqual({
+        user: user,
         accessToken: 'accessToken',
         refreshToken: 'refreshToken',
       });
