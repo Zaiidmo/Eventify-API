@@ -27,7 +27,6 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/mongoose": "^10.1.0",
     "@nestjs/passport": "^10.0.3",
-    "@nestjs/platform-express": "^10.4.11",
     "@types/multer": "^1.4.12",
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-local": "^1.0.38",
