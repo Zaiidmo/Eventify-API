@@ -75,6 +75,15 @@ export class EventRepository {
       .exec();
   }
 
+  // Get the latest event
+  async findLatestEvent(): Promise<EventDocument> {
+    return this.eventModel
+      .findOne()
+      .sort({ createdAt: -1 })
+      .limit(1)
+      .exec();
+  }
+
   //   // Find events by location
   //   async findEventsByLocation(location: string): Promise<Event[]> {
   //     return this.eventModel.find({ location }).exec();

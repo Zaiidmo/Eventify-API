@@ -12,12 +12,12 @@ export class EventsService {
   // Create a new event
   async createEvent(
     createEventDto: CreateEventDto,
-    bannerPath: string,
+    banenrUrl: string,
     organizer: Types.ObjectId,
   ): Promise<EventDocument> {
     const eventData = {
       ...createEventDto,
-      banner: bannerPath || null,
+      banner: banenrUrl || null,
       organizer,
     };
 
@@ -96,6 +96,11 @@ export class EventsService {
   // Fetch upcoming events
   async getUpcomingEvents(): Promise<Event[]> {
     return this.eventRepository.findUpcomingEvents();
+  }
+
+  // Get the latest event
+  async getLatestEvent(): Promise<EventDocument | null> {
+    return this.eventRepository.findLatestEvent();
   }
   // // Fetch events by location
   // async getEventsByLocation(location: string): Promise<Event[]> {
