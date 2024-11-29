@@ -73,7 +73,7 @@ export class AuthService {
 
   async login(
     loginDto: LoginDto,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  ): Promise<{ user: object ,accessToken: string; refreshToken: string }> {
     const { email, password } = loginDto;
 
     //Find the user
@@ -94,8 +94,9 @@ export class AuthService {
     //Generate Tokens
     const accessToken = this.generateAccessToken(user);
     const refreshToken = this.generateRefreshToken(user);
+    const authUser = user;
 
-    return { accessToken, refreshToken };
+    return { user: authUser, accessToken, refreshToken };
   }
 
   async refreshToken(
