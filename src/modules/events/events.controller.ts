@@ -128,4 +128,16 @@ export class EventsController {
       throw new Error(error.message);
     }
   }
+
+  // Fetch the latest shared event
+  @Get('latest')
+  @Public()
+  async findLatestEvent() {
+    try {
+      const event = await this.eventsService.getLatestEvent();
+      return event;
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }
 }
