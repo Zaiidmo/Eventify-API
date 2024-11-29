@@ -12,12 +12,12 @@ export class EventsService {
   // Create a new event
   async createEvent(
     createEventDto: CreateEventDto,
-    bannerPath: string,
+    banenrUrl: string,
     organizer: Types.ObjectId,
   ): Promise<EventDocument> {
     const eventData = {
       ...createEventDto,
-      banner: bannerPath || null,
+      banner: banenrUrl || null,
       organizer,
     };
 

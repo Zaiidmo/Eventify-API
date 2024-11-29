@@ -23,7 +23,7 @@ export class UploadService implements UploadInterface {
             Bucket: process.env.AWS_S3_BUCKET_NAME,
             Key: uniqueFileName,
             Body: file.buffer,
-            ACL: 'public-read',
+            ContentType: file.mimetype,
         };
 
     try { 
