@@ -163,4 +163,34 @@ export class EventsController {
       throw new Error(error.message);
     }
   }
+
+  // Get popular locations
+  @Get('popular-locations')
+  async getPopularLocations() {
+    const locations = await this.eventsService.getPopularLocations();
+    return {
+      message: 'Popular locations fetched successfully',
+      data: locations,
+    };
+  }
+
+  // Get top organizers
+  @Get('top-organizers')
+  async getTopOrganizers() {
+    const organizers = await this.eventsService.getTopOrganizers();
+    return {
+      message: 'Top organizers fetched successfully',
+      data: organizers,
+    };
+  }
+
+  // Get past events
+  @Get('past-events')
+  async getPastEvents() {
+    const events = await this.eventsService.getPastEvents();
+    return {
+      message: 'Past events fetched successfully',
+      data: events,
+    };
+  }
 }

@@ -102,6 +102,21 @@ export class EventsService {
   async getLatestEvent(): Promise<EventDocument | null> {
     return this.eventRepository.findLatestEvent();
   }
+
+  // Get popular locations
+  async getPopularLocations() {
+    return this.eventRepository.findPopularLocations();
+  }
+
+  // Get top organizers
+  async getTopOrganizers() {
+    return this.eventRepository.findTopOrganizers();
+  }
+
+  // Get past events
+  async getPastEvents() {
+    return this.eventRepository.findPastEvents();
+  }
   // // Fetch events by location
   // async getEventsByLocation(location: string): Promise<Event[]> {
   //   return this.eventRepository.findEventsByLocation(location);
