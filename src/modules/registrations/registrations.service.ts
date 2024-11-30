@@ -34,6 +34,14 @@ export class RegistrationsService {
 
     // const userId = new Types.ObjectId(user).toHexString();
     const eventId = new Types.ObjectId(event).toHexString();
+    
+    if(eventDetails.date < new Date()) {
+      throw new BadRequestException('Event has already passed');
+    }
+    if(eventDetails.organizer.toString() === userId) {
+      throw new BadRequestException('You cannot register for your own event');
+    }
+
 
     // Check if the user is already registered for the event
     const existingRegistration = await this.registrationRepository.findOne({
