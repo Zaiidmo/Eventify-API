@@ -10,6 +10,7 @@ import {
   Delete,
   Get,
   BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -200,4 +201,24 @@ export class EventsController {
       data: events,
     };
   }
+
+  // Get User's Events
+  @Get('my-events')
+  @Roles(Role.ORGANIZER)
+  async getMyEvents(@Request() request: REQ) {
+    const organizer = request.user._id;
+    if(!organizer) {
+      throw new UnauthorizedException('You are not authorized !')
+    }
+    try {
+      const events = await this.eventsService.getUsersEvents(organizer);
+      return {
+        message : 'Events fetched successfully',
+        data: events
+      }
+    } catch (err) {
+
+    }
+  }
+
 }

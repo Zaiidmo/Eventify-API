@@ -114,6 +114,11 @@ export class EventRepository {
       .exec();
   }
 
+  // Find Event By Organizer 
+  async findByOrganizer(organizer: Types.ObjectId): Promise<Event[]>{
+    return this.eventModel.find({ organizer: organizer})
+  }
+
   //   // Find events by location
   //   async findEventsByLocation(location: string): Promise<Event[]> {
   //     return this.eventModel.find({ location }).exec();
