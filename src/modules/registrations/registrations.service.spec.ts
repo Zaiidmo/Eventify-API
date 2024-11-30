@@ -6,6 +6,7 @@ import { CreateRegistrationDto } from './dto/create-registration.dto';
 import { Types } from 'mongoose';
 import { EventDocument } from '../events/events.schema';
 import { RegistrationDocument } from './registrations.schema';
+import { HttpException } from '@nestjs/common';
 
 describe('RegistrationsService', () => {
   let service: RegistrationsService;
@@ -81,8 +82,8 @@ describe('RegistrationsService', () => {
       registrationRepository.findOne.mockResolvedValue(mockRegistration);
     
       // Expecting the error to be thrown
-      await expect(service.createRegistration(mockDto, userId)).rejects.toThrow(
-        new Error('You are already registered for this event.')
+      await expect(service.createRegistration(mockDto, userId)).rejects.toThrowError(
+        new HttpException('You are already registered for this event', 400)
       );
     });
     

@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  HttpException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -8,6 +9,7 @@ import { UpdateRegistrationDto } from './dto/update-registration.dto';
 import { RegistrationRepository } from './registrations.repository';
 import { EventRepository } from '../events/events.repository';
 import { ObjectId, Types } from 'mongoose';
+import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 
 @Injectable()
 export class RegistrationsService {
@@ -40,7 +42,7 @@ export class RegistrationsService {
     });
 
     if (existingRegistration) {
-      throw new Error('You are already registered for this event.');
+      throw new HttpException('You are already registered for this event', 400);
     }
 
     // Ensure event has capacity
