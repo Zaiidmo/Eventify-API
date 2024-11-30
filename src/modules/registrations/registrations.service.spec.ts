@@ -52,13 +52,13 @@ describe('RegistrationsService', () => {
       expect(eventRepository.findById).toHaveBeenCalledWith(mockDto.event);
     });
 
-    it('should return a message if the user is already registered', async () => {
+    it('should throw an error if the user is already registered', async () => {
       const mockDto: CreateRegistrationDto = {
         event: new Types.ObjectId('6748470e29161eed22749ccb'),
         user: 'userId',
       };
       const userId = 'userId';
-
+    
       const mockEvent = {
         id: new Types.ObjectId(),
         title: 'Sample Event',
@@ -68,23 +68,24 @@ describe('RegistrationsService', () => {
         organizer: new Types.ObjectId(),
         capacity: 100,
       } as unknown as EventDocument;
-
+    
       const mockRegistration = {
         id: 'registration-id',
         user: new Types.ObjectId(),
         event: new Types.ObjectId(),
         registrationDate: new Date(),
       } as unknown as RegistrationDocument;
-
+    
+      // Mocking repository calls
       eventRepository.findById.mockResolvedValue(mockEvent);
       registrationRepository.findOne.mockResolvedValue(mockRegistration);
-
-      const result = await service.createRegistration(mockDto, userId);
-
-      expect(result).toEqual({
-        message: 'You are already registered for this event.',
-      });
+    
+      // Expecting the error to be thrown
+      await expect(service.createRegistration(mockDto, userId)).rejects.toThrow(
+        new Error('You are already registered for this event.')
+      );
     });
+    
 
     it('should throw an error if the event is full', async () => {
       const mockDto: CreateRegistrationDto = {

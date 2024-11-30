@@ -66,10 +66,15 @@ export class RegistrationsController {
   @Get('user')
   async getUserRegistrations(@Request() request: req) {
     try {
-      const user = request.user._id.toString();
-      return this.registrationsService.getUserRegistrations(user);
+      const user = request.user._id;
+      const registrations = await this.registrationsService.getUserRegistrations(user);
+      return {
+        message: 'User registrations fetched successfully',
+        data: registrations,
+      };
     } catch (error) {
-      throw new Error(error);
+      console.error('Error in RegistrationController:', error);
+      throw new Error('Failed to fetch user registrations');
     }
   }
 }

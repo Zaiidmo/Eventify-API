@@ -7,7 +7,7 @@ import { CreateRegistrationDto } from './dto/create-registration.dto';
 import { UpdateRegistrationDto } from './dto/update-registration.dto';
 import { RegistrationRepository } from './registrations.repository';
 import { EventRepository } from '../events/events.repository';
-import { Types } from 'mongoose';
+import { ObjectId, Types } from 'mongoose';
 
 @Injectable()
 export class RegistrationsService {
@@ -40,10 +40,7 @@ export class RegistrationsService {
     });
 
     if (existingRegistration) {
-      // throw new Error('You are already registered for this event.');
-      return {
-        message: 'You are already registered for this event.',
-      };
+      throw new Error('You are already registered for this event.');
     }
 
     // Ensure event has capacity
@@ -100,11 +97,13 @@ export class RegistrationsService {
     }
   }
 
-  async getUserRegistrations(userId: string): Promise<any> {
-    const participations = this.registrationRepository.getUserRegistrations(userId);
-    return {
-      message: 'User registrations',
-      data: participations
+  async getUserRegistrations(userId: Types.ObjectId) {
+    try {
+      const registrations = await this.registrationRepository.getUserRegistrations(userId);
+      return registrations;
+    } catch (error) {
+      console.error('Error in RegistrationService:', error);
+      throw new Error('Failed to get user registrations');
     }
   }
 }
