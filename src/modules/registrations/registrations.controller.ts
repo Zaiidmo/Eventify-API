@@ -61,4 +61,15 @@ export class RegistrationsController {
       throw new Error(error);
     }
   }
+
+  // Get all registrations for a user
+  @Get('user')
+  async getUserRegistrations(@Request() request: req) {
+    try {
+      const user = request.user._id.toString();
+      return this.registrationsService.getUserRegistrations(user);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 }

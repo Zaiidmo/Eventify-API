@@ -99,4 +99,12 @@ export class RegistrationsService {
       data: participations
     }
   }
+
+  async getUserRegistrations(userId: string): Promise<any> {
+    const participations = this.registrationRepository.getUserRegistrations(userId);
+    return {
+      message: 'User registrations',
+      data: participations
+    }
+  }
 }

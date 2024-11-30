@@ -33,4 +33,8 @@ export class RegistrationRepository {
   async getEventsRegistrations(eventId: Types.ObjectId) {
     return this.registrationModel.find({ event: eventId }).exec();
   }
+
+  async getUserRegistrations(userId: string) {
+    return this.registrationModel.find({ user: userId }).populate('event').exec();
+  }
 }
