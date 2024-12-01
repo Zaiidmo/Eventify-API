@@ -40,7 +40,7 @@ export class RegistrationRepository {
     const user = userId.toString();
     try {
       const result = await this.registrationModel.find({ user }).populate('event').populate('user').exec();
-      console.log('result', result);
+      // console.log('result', result);
       return result;
     } catch (error) {
       console.error('Error fetching user registrations:', error);

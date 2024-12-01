@@ -128,7 +128,7 @@ export class EventsService {
   // Get Users Events
   async getUsersEvents(organizer: Types.ObjectId){
     const response= this.eventRepository.findByOrganizer(organizer)
-    console.log(response);
+    // console.log(response);
     return response
   }
   // // Fetch events by location

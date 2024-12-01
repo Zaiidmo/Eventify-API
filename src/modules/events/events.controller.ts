@@ -40,7 +40,7 @@ export class EventsController {
     @Request() request: REQ,
   ) {
     const organizerId = request.user._id;
-    console.log('organizerId', organizerId);
+    // console.log('organizerId', organizerId);
 
     let bannerUrl = null;
     if (file) {
@@ -77,7 +77,7 @@ export class EventsController {
   ) {
     const _eventId = new Types.ObjectId(eventId);
     const authenticatedUser = req.user._id;
-    console.log('authenticatedUser', authenticatedUser);
+    // console.log('authenticatedUser', authenticatedUser);
 
     let bannerUrl = null;
     if (file) {
