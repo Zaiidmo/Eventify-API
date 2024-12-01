@@ -10,6 +10,7 @@ import {
   Delete,
   Get,
   BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -26,20 +27,20 @@ import { UploadService } from '@/upload/providers/upload.service';
 export class EventsController {
   constructor(
     private readonly eventsService: EventsService,
-    private readonly uploadService: UploadService, 
+    private readonly uploadService: UploadService,
   ) {}
 
   // Create a new event
   @Post('create')
   @Roles(Role.ORGANIZER)
-  @UseInterceptors(FileInterceptor('banner')) 
+  @UseInterceptors(FileInterceptor('banner'))
   async createEvent(
     @Body() createEventDto: CreateEventDto,
     @UploadedFile() file: Express.Multer.File,
     @Request() request: REQ,
   ) {
     const organizerId = request.user._id;
-    console.log('organizerId', organizerId);
+    // console.log('organizerId', organizerId);
 
     let bannerUrl = null;
     if (file) {
@@ -47,7 +48,9 @@ export class EventsController {
         const uploadResult = await this.uploadService.uploadFile(file);
         bannerUrl = uploadResult.url;
       } catch (error) {
-        throw new BadRequestException(`Failed to upload banner: ${error.message}`);
+        throw new BadRequestException(
+          `Failed to upload banner: ${error.message}`,
+        );
       }
     }
 
@@ -74,7 +77,7 @@ export class EventsController {
   ) {
     const _eventId = new Types.ObjectId(eventId);
     const authenticatedUser = req.user._id;
-    console.log('authenticatedUser', authenticatedUser);
+    // console.log('authenticatedUser', authenticatedUser);
 
     let bannerUrl = null;
     if (file) {
@@ -82,7 +85,9 @@ export class EventsController {
         const uploadResult = await this.uploadService.uploadFile(file);
         bannerUrl = uploadResult.url;
       } catch (error) {
-        throw new BadRequestException(`Failed to upload banner: ${error.message}`);
+        throw new BadRequestException(
+          `Failed to upload banner: ${error.message}`,
+        );
       }
     }
 
@@ -163,4 +168,57 @@ export class EventsController {
       throw new Error(error.message);
     }
   }
+
+  // Get popular locations
+  @Get('popular-locations')
+  @Public()
+  async getPopularLocations() {
+    const locations = await this.eventsService.getPopularLocations();
+    return {
+      message: 'Popular locations fetched successfully',
+      data: locations,
+    };
+  }
+
+  // Get top organizers
+  @Get('top-organizers')
+  @Public()
+  async getTopOrganizers() {
+    const organizers = await this.eventsService.getTopOrganizers();
+    return {
+      message: 'Top organizers fetched successfully',
+      data: organizers,
+    };
+  }
+
+  // Get past events
+  @Get('past-events')
+  @Public()
+  async getPastEvents() {
+    const events = await this.eventsService.getPastEvents();
+    return {
+      message: 'Past events fetched successfully',
+      data: events,
+    };
+  }
+
+  // Get User's Events
+  @Get('my-events')
+  @Roles(Role.ORGANIZER)
+  async getMyEvents(@Request() request: REQ) {
+    const organizer = request.user._id;
+    if(!organizer) {
+      throw new UnauthorizedException('You are not authorized !')
+    }
+    try {
+      const events = await this.eventsService.getUsersEvents(organizer);
+      return {
+        message : 'Events fetched successfully',
+        data: events
+      }
+    } catch (err) {
+
+    }
+  }
+
 }

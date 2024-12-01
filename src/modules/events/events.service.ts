@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { EventRepository } from './events.repository';
@@ -20,6 +20,13 @@ export class EventsService {
       banner: banenrUrl || null,
       organizer,
     };
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); 
+    const enteredDate = new Date(eventData.date);
+    
+    if (enteredDate < today) {
+      throw new BadRequestException('The event date cannot be in the past.');
+    }
 
     return this.eventRepository.create(eventData);
   }
@@ -101,6 +108,28 @@ export class EventsService {
   // Get the latest event
   async getLatestEvent(): Promise<EventDocument | null> {
     return this.eventRepository.findLatestEvent();
+  }
+
+  // Get popular locations
+  async getPopularLocations() {
+    return this.eventRepository.findPopularLocations();
+  }
+
+  // Get top organizers
+  async getTopOrganizers() {
+    return this.eventRepository.findTopOrganizers();
+  }
+
+  // Get past events
+  async getPastEvents() {
+    return this.eventRepository.findPastEvents();
+  }
+
+  // Get Users Events
+  async getUsersEvents(organizer: Types.ObjectId){
+    const response= this.eventRepository.findByOrganizer(organizer)
+    // console.log(response);
+    return response
   }
   // // Fetch events by location
   // async getEventsByLocation(location: string): Promise<Event[]> {
