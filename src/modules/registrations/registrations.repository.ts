@@ -27,9 +27,14 @@ export class RegistrationRepository {
     return this.registrationModel.deleteOne(filter).exec();
   }
 
-  async getEventsRegistrations(eventId: Types.ObjectId) {
-    return this.registrationModel.find({ event: eventId }).exec();
+  async getEventsRegistrations(eventId: string) {
+    const response = await this.registrationModel
+      .find({ event: eventId })
+      .populate('user') 
+      .exec();
+    return response; 
   }
+  
 
   async getUserRegistrations(userId: Types.ObjectId) {
     const user = userId.toString();

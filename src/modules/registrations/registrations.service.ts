@@ -90,7 +90,7 @@ export class RegistrationsService {
   }
 
   async getEventsRegistrations(eventId: string, userId: Types.ObjectId): Promise<any> {
-    const event_id = new Types.ObjectId(eventId);
+    const event_id = new Types.ObjectId(eventId);    
     const eventDetails = await this.eventRepository.findById(event_id);
     if (!eventDetails) {
       throw new NotFoundException('Event not found');
@@ -100,7 +100,8 @@ export class RegistrationsService {
         'You are not authorized to view this resource',
       );
     }
-    const participations = this.registrationRepository.getEventsRegistrations(event_id);
+    const participations = await this.registrationRepository.getEventsRegistrations(eventId);
+    // console.log('response', participations);
     return {
       message: 'Event registrations',
       data: participations
