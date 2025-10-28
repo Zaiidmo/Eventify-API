@@ -71,6 +71,8 @@ cp .env.example .env
 ## 🧩 Installation Options
 
 ### 🐳 Using Docker
+Rename the dockerfile: 
+``` Rename the dockerfile by removing the '.local'```
 Build and run the image:
 ```bash
 docker build -t eventify-api .
