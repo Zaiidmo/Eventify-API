@@ -25,18 +25,15 @@ export class RegistrationsController {
     @Body() createRegistrationDto: CreateRegistrationDto,
     @Request() request: req,
   ): Promise<any> {
-    // const user = request.user._id.toString();
-    // try {
-    //   return this.registrationsService.createRegistration(
-    //     createRegistrationDto,
-    //     user,
-    //   ); //Commented to host the demo app
-    // } catch (error) {
-    //   throw new Error(error.message);
-    // }
-    return Promise.resolve({
-      message: 'Events registration is disabled in the demo application.',
-    });
+    const user = request.user._id.toString();
+    try {
+      return this.registrationsService.createRegistration(
+        createRegistrationDto,
+        user,
+      );
+    } catch (error) {
+      throw new Error(error.message);
+    }
   }
 
   // Delete a regestration

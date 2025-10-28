@@ -14,8 +14,9 @@ export class AuthRepository {
   }
 
   async create(userData: RegisterDto): Promise<UserDocument> {
-    const newUser = new this.userModel(userData);
-    return newUser.save();
+    // const newUser = new this.userModel(userData);
+    // return newUser.save(); //Commented to host the demo app
+    throw new Error('User registration is disabled in the demo application.');
   }
 
   async updateLastLogin(userId: string): Promise<void> {
