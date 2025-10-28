@@ -14,8 +14,9 @@ export class RegistrationRepository {
   async create(
     createRegistrationDto: CreateRegistrationDto,
   ): Promise<RegistrationDocument> {
-    const registration = new this.registrationModel(createRegistrationDto);
-    return registration.save();
+    // const registration = new this.registrationModel(createRegistrationDto);
+    // return registration.save(); //Commented to host the demo app
+    throw new Error('Event registration creation is disabled in the demo application.');
   }
   async findOne(filter: {
     user: string;
