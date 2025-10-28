@@ -27,6 +27,7 @@ Built on **NestJS** and **MongoDB**, it’s fully containerized for scalability 
 - 🔐 **User Authentication** — Secure JWT-based login and registration.  
 - 🗓️ **Event Management** — Create, edit, and explore events effortlessly.  
 - 🧩 **Database Integration** — Seamless data persistence via **Mongoose**.  
+- ☁️ **Cloud Storage (AWS S3)** — Secure upload and retrieval of event images with automatic URL generation.
 - 🐳 **Dockerized Architecture** — Ready-to-deploy image for any environment.  
 - ⚙️ **CI/CD Pipeline** — GitHub Actions automate testing, building, and Docker deployment.  
 
