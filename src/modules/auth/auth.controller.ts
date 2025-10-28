@@ -26,7 +26,8 @@ export class AuthController {
   @UseInterceptors(ExcludePasswordInterceptor)
   @HttpCode(HttpStatus.CREATED)
   async register(@Body(new ValidationPipe()) registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
+    // return this.authService.register(registerDto); //Commented to host the demo app 
+    return { message: 'Registration is disabled in the demo application.' };
   }
 
   @Post('login')
